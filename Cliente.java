@@ -8,14 +8,16 @@ import java.util.Scanner;
 public class Cliente {
 	public static void main(String[] args) throws IOException {
 		Scanner in = new Scanner (System.in);
-		
+		int SR = leia.nextInt();
+		//SR arranjo = new SR[SR];
+		int windowMax = (SR/2)-1;
 		while (true) {
 		DatagramSocket clientSocket = new DatagramSocket(); //criando o socket UDP
 		InetAddress IPServer = InetAddress.getByName("localhost"); //Definindo o IP do Server
 		String mensagem = in.nextLine(); //mensagem a ser enviada
 		
 		byte [] sendData;
-		sendData = (mensagem).getBytes(); //defininfo dados que v„o ser enviados
+		sendData = (mensagem).getBytes(); //defininfo dados que v√£o ser enviados
 		DatagramPacket sendPacket = new DatagramPacket (sendData, sendData.length, IPServer, 5000); //definindo os dados
 		long as = System.nanoTime();
 		clientSocket.send(sendPacket);
@@ -39,3 +41,16 @@ public class Cliente {
 	}
 
 }
+class SelectiveR{
+	boolean checked;
+	//dado dado
+	public SelectiveR(){
+		this.checked = false;
+		//this.dado = null;
+		
+	}
+}
+/*
+[0 1 2 3 4] 5 6 7 8 9 10
+0 1 2 3 4 [5 6 7 8 9] 10
+*/
