@@ -1,3 +1,4 @@
+import java.util.Random;
 public class SRsender{//talvez tenha q troar os public por static
     public int numerodebytes;//a serem enviados
     public int porta; //porta udp para a qual enviar
@@ -21,6 +22,11 @@ public class SRsender{//talvez tenha q troar os public por static
         this.j=tamanhojanela-1;
         this.probability=probability;
     }
+public static boolean Descarta(int x){//x é o número definido pelo usuário
+	      Random gerador = new Random();
+    		if(x<gerador.nextInt(100)) return true;
+    		else return false;
+    	}
     class Send extends Thread{
         public void run(){
             while(qntenviados<numerodebytes){
