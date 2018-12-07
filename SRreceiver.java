@@ -6,5 +6,9 @@ public class SRreceiver{
     public int qntrecebidos;//numero de pacotes confirmados
     public byte [] arquivo;//array de bytes compondo o arquivo
     public int []state;//0-enviaveis mas nao enviados   1-confirmado 2-esperando ack
-    
+    public int mod;
+
+
+    //run
+
 }
