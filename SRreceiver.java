@@ -14,7 +14,7 @@ public class SRreceiver{
 		this.qntrecebidos=0;
 		this.tamanhojanela=tamanhojanela;
 		this.porta=porta;
-		this.state= new int[tamanhojanela];
+		this.state = new int[tamanhojanela];// saber o estado do selective, decidindo se coloca, manda ack, etc
 		this.buffer = new byte[tamanhojanela];
 		this.i=0;
 		this.j=tamanhojanela-1;
