@@ -33,11 +33,26 @@ public class SRsender{//talvez tenha q troar os public por static
             }
         }
     }
-
+//Utilizado mas não enviado == 0
+//Já confirmado == 1
+//Enviado mas não confirmado == 2
+int index;//indice recebido do servidor
     class Receive extends Thread{
-       public void run(){
+	public void run(){
+		while(qntenviados<numerodebytes){
+			if(state[index] == 1){
+				if(index == i){//em caso de ser o menor da janela
+					i++;
+					j++;
+				}
+			}else if(state[index] == 2){
+				state[index] = 1;
+				if(i == index){//em caso de ser o menor da janela
+					i++;
+					j++:
+				}
+			}
+		}
+	}
+}
 
-       }
-        
-    }
-} 
