@@ -9,6 +9,7 @@ public class SRsender{//talvez tenha q troar os public por static
     public long timer;
     public int i, j;
     public int probability;
+    public int mod;
     public SRsender(int porta, int tamanhojanela, byte []arquivo, long timeout,int  probability){
         this.porta=porta;
         this.tamanhojanela=tamanhojanela;
@@ -21,6 +22,7 @@ public class SRsender{//talvez tenha q troar os public por static
         this.i=0;
         this.j=tamanhojanela-1;
         this.probability=probability;
+        this.mod=tamanhojanela*2 +1;
     }
 public static boolean Descarta(int x){//x é o número definido pelo usuário
 	      Random gerador = new Random();
@@ -29,15 +31,17 @@ public static boolean Descarta(int x){//x é o número definido pelo usuário
     	}
     class Send extends Thread{
         public void run(){
+            timer = System.nanoTime();
+            int aux = System.nanoTime();
             while(qntenviados<numerodebytes){
-                if(timer>=timeout){
-                    for(int k=i;k<=j && j<numerodebytes;k++){
+                if(timer-aux>=timeout){
+                    for(int k=i;k<=j;k++){
                         if(state[k]==0 || state[k]==2){
-                            //envia arquivo[k] e k%tamjanela pela porta
-                            state[k]=2;
+                            //envia arquivo[k] e indice k%mod porta
+                            state[k]=2;//marca como enviado
                         }
                     }
-                    timer = System.nanoTime();
+                    timer = System.nanoTime();//reseta timer
                 }   
             }
         }
@@ -50,15 +54,15 @@ class Receive extends Thread{
    
     public void run(){
         while(qntenviados<numerodebytes){
-            //receber indice (ack) modular
+            //receber index aqui
             
             if(state[index]==2 && !Descarta(probability)){
                 state[index]=1;//confirma pacote
                 qntenviados++;//conta mais um confirmado
                 while(state[i]==1){
                     state[i] = 0;
-                    i=(i+1)%tamanhojanela;
-                    j=(j+1)%tamanhojanela;
+                    i=(i+1)%mod;
+                    j=(j+1)%mod;
                 }
 
             }
