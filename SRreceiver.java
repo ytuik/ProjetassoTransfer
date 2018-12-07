@@ -9,6 +9,29 @@ public class SRreceiver{
     public int mod;
 
 
-    //run
+    public void run(){
+    	  i = 0;
+    	  j = tamanhojanela-1;
+    	  for(int k = i; k<=j;k++){
+    	  	state[k] = 1;
+    	  }
+        while(qntrecebidos<numerodebytes){
+           		 //receber arquivo e indice
+           		 if(state[index] == 0){
+           		 	//send Ack
+           		 }else{
+		             state[index]=0;//confirma pacote
+		             //send Ack
+		             //Salvar Buffer;//array de bytes (index)
+		             qntrecebidos++;
+		             while(state[i]==0){
+		                 //Inserir no vector
+		                 i=(i+1)%mod;
+		                 state[(j+1)%mod] = 1;
+		                 j=(j+1)%mod;
+		             }
+           		 }
+		}
+	}
 
 }
