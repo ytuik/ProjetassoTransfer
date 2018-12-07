@@ -47,10 +47,7 @@ public static boolean Descarta(int x){//x é o número definido pelo usuário
 //Enviado mas não confirmado == 2
 class Receive extends Thread{
     int index;//indice recebido do servidor
-    boolean Descarta(int probability){
-        int x = 213131;//numero randomico de 0 a 99 aqui
-        return x <= probability;
-    }
+   
     public void run(){
         while(qntenviados<numerodebytes){
             //receber indice (ack) modular
