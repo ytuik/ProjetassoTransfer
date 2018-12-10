@@ -1,6 +1,7 @@
 //classe recebedora de bytes via selective repeat
 
 public class SRreceiver {
+	public InetAddress IP;
     public int numeroDeBytes;//a serem recebidos
     public int porta; //porta udp por onde receber
     public int tamanhoJanela;//tamanho da janela q deve ser (tamanho da seq)/2
@@ -11,7 +12,7 @@ public class SRreceiver {
 	public byte [] buffer;//pacotes bufferizados serao colocados aqui
 	public List<Byte> myBytes;
 
-	public SRreceiver(int porta, int tamanhoJanela, int numeroDeBytes) {
+	public SRreceiver(int porta, int tamanhoJanela, int numeroDeBytes, InetAddress IP) {
 		this.qntRecebido = 0;
 		this.tamanhoJanela = tamanhoJanela;
 		this.porta = porta;
@@ -20,28 +21,38 @@ public class SRreceiver {
 		this.i = 0;
 		this.j = tamanhoJanela - 1;
 		this.mod = tamanhoJanela * 2 + 1;
+		this.IP=IP;
 		List<Byte> myBytes = new ArrayList<Byte>();
 	}
 
-    public void run() {
+	class SendAck extends Thread{
+		int ack;
+		public SendAck(int ack){
+			this.ack=ack;
+		}
+		public void run(){
+			//ENVIAR ACK VIA UDP AQUI
+		}
+	}
+	class ReceiveByte() extends Thread{
+		public ReceiveByte(){}
+	
+		public void run() {
     	for(int k = i; k <= j; k++){
 			state[k] = 1;//desconfirma todos os indices na 1a janela
 			//todos os outros estão com 0, significando que estão confirmados
     	}
         while(qntRecebido < numeroDeBytes) {
+				int ack;
 				/**
 				 * RECEBER BYTE E SEU INDICE NA JANELA AQUI
 				 * VIA PORTA DO SERVIDOR
 				 */
-        	if(state[index] == 0) {
-           	 	/**
-					 * ENVIAR ACK (inteiro igual a "index" pro cliente)
-					 * POIS O STATE=0 SIGNIFICA Q ELE JÁ FOI RECEBIDO E CONFIRMADO
-					 * OU QUE ELE ESTÁ FORA DA JANELA ATUAL 
-				*/
-           	} else {
+				 SendAck thr = new SendAck(ack);
+				 thr.start();
+        
 		        state[index] = 0;//confirma pacote
-		        //ENVIAR ACK (inteiro igual a "index" pro cliente)
+		        
 
 				//Salvar Buffer;//array de bytes (index)
 				//buffer[index]="BYTE RECEBIDO AQUI";
@@ -62,8 +73,10 @@ public class SRreceiver {
 		            state[(j + 1) % mod] = 1;
 		            j = (j + 1) % mod;
 		        }
-           	}
+           	
 		}
 		//TALVEZ USAR A LISTA PARA RECRIAR O ZIP AQUI (fim do run)
 	}
+}
+    
 }

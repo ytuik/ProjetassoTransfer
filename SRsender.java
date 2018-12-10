@@ -13,8 +13,10 @@ public class SRsender {//talvez tenha q trocar os public por static
     public int i, j;//limites da janela
     public int probability;//definirá a probabilidade de descartar
     public int mod;//q deve ser (o dobro do tamanho da janela) +1
+    public InetAddress IP;
 
-    public SRsender(int porta, int tamanhoJanela, byte []arquivo, long timeout,int  probability) {
+    public SRsender(int porta, int tamanhoJanela, byte []arquivo, long timeout,int  probability,  InetAddress IP) {
+        this.IP=IP;
         this.porta = porta;
         this.tamanhoJanela = tamanhoJanela;
         this.qntEnviados = 0;
@@ -85,4 +87,3 @@ public class SRsender {//talvez tenha q trocar os public por static
     }
 }
 
-//0 1 2 3 4 0 1 2 3 4
