@@ -30,7 +30,7 @@ public class SRsender {//talvez tenha q trocar os public por static
         this.probability = probability;
         this.mod = tamanhoJanela * 2 + 1;
     }
-    public envia(){
+    public void envia(){
         Send enviador = new Send();
         Receive recebedor = new Receive();
         enviador.start();

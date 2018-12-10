@@ -31,7 +31,7 @@ public class ServidorUDP {
         saidaArquivo.close();
         socket.close();
 
-
+//recebimento
         SRreceiver serv = new SRreceiver( porta,  tamanhoJanela,  numeroDeBytes,  IP);
         serv.recebe();
         //serv.recebe ira printatr uma msg dizendo para apertar enter
@@ -39,5 +39,6 @@ public class ServidorUDP {
         String nada = in.nextLine();
         List<byte> lista = serv.getList();
         //arquivo sera recebido aqui no list
+        //JUNTAR LIST DE BYTE NO ARQUIVO
     }
 }
