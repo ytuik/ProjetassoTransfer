@@ -10,7 +10,7 @@ public class SRreceiver {
     public int []state;//0-enviaveis mas nao enviados   1-confirmado 2-esperando ack
 	public int mod;//q deve ser (o dobro do tamanho da janela) +1
 	public byte [] buffer;//pacotes bufferizados serao colocados aqui
-	public List<Byte> myBytes;
+	public List<byte> myBytes;
 
 	public SRreceiver(int porta, int tamanhoJanela, int numeroDeBytes, InetAddress IP) {
 		this.qntRecebido = 0;
@@ -22,9 +22,17 @@ public class SRreceiver {
 		this.j = tamanhoJanela - 1;
 		this.mod = tamanhoJanela * 2 + 1;
 		this.IP=IP;
-		List<Byte> myBytes = new ArrayList<Byte>();
+		List<byte> myBytes = new ArrayList<Byte>();
 	}
+	List<byte> getList(){
+		return this.myBytes;
+	}
+	void recebe (){
+		ReceiveByte ByteReceiver = new ReceiveByte();
+		ByteReceiver.start();
 
+
+	}
 	class SendAck extends Thread{
 		int ack;
 		public SendAck(int ack){
@@ -75,6 +83,8 @@ public class SRreceiver {
 		        }
            	
 		}
+		System.out.println("arquivo recebido\naperte enter para continuar");
+
 		//TALVEZ USAR A LISTA PARA RECRIAR O ZIP AQUI (fim do run)
 	}
 }

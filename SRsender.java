@@ -30,6 +30,12 @@ public class SRsender {//talvez tenha q trocar os public por static
         this.probability = probability;
         this.mod = tamanhoJanela * 2 + 1;
     }
+    public envia(){
+        Send enviador = new Send();
+        Receive recebedor = new Receive();
+        enviador.start();
+        recebedor.start();
+    }
     
     public static boolean descarta(int x) {//x é o número definido pelo usuário de 0 a 100
 	    Random gerador = new Random();
@@ -59,6 +65,7 @@ public class SRsender {//talvez tenha q trocar os public por static
                     timer = System.nanoTime();//reseta timer
                 }   
             }
+             System.out.println("arquivo enviado");
         }
     }
     //na janela mas não enviado == 0
@@ -83,6 +90,7 @@ public class SRsender {//talvez tenha q trocar os public por static
 
                 }
             }
+            System.out.println("arquivo enviado");
         }
     }
 }

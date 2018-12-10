@@ -36,6 +36,13 @@ public class ClienteUDP {
         
         socket.close();
         entradaArquivo.close();
+
+
+        //envio começa aqui
+        SRsender SR = new SRsender( porta,  tamanhoJanela,  arraybyte,  timeout,  probability,   IP);
+        SR.envia();//cria thread e envia 
+        //envio termina aqui
+
         
     }
 }

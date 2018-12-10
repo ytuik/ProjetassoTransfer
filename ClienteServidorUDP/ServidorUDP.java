@@ -30,5 +30,14 @@ public class ServidorUDP {
         }
         saidaArquivo.close();
         socket.close();
+
+
+        SRreceiver serv = new SRreceiver( porta,  tamanhoJanela,  numeroDeBytes,  IP);
+        serv.recebe();
+        //serv.recebe ira printatr uma msg dizendo para apertar enter
+        Scanner in = new Scanner(System.in);
+        String nada = in.nextLine();
+        List<byte> lista = serv.getList();
+        //arquivo sera recebido aqui no list
     }
 }
