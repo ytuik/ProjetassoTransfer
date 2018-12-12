@@ -35,7 +35,7 @@ public class Cliente {
             if (prob < 100 && prob >= 0) {
                 break;
             }else{
-                System.out.println("Valor inválido, por favor, digite um número de 0 a 99.")
+                System.out.println("Valor inválido, por favor, digite um número de 0 a 99.");
             }
         }
 
