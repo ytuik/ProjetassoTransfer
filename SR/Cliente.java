@@ -28,25 +28,27 @@ public class Cliente {
             tamanho = s.nextInt();
         }
 
-        System.out.println("Probabilidade de descarte:");
+        System.out.println("Probabilidade de descarte sem utilizar % :");
         int prob;
         while (true) {
             prob = s.nextInt();
             if (prob < 100 && prob >= 0) {
                 break;
+            }else{
+                System.out.println("Valor inválido, por favor, digite um número de 0 a 99.")
             }
         }
 
-        System.out.println("Nome do arquivo a ser criado:");
+        System.out.println("Digite o nome do arquivo a ser criado:");
         String fileName = s.nextLine();
 
         int port = 8001;
         DatagramSocket socket = new DatagramSocket(port);
         ClienteSR receiver;
         if (escolha) {
-            receiver = new ClienteSR(socket, fileName, tamanho);
+            receiver = new ClienteSR(socket, fileName, tamanho, prob);
         } else {
-            receiver = new ClienteSR(socket, fileName);
+            receiver = new ClienteSR(socket, fileName, prob);
         }
         receiver.start();
     }
