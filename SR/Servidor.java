@@ -23,9 +23,11 @@ public class Servidor {
 
         // Checa arquivo
         File f = new File(divide[1]);
-        if (!f.exists() || !f.canRead()) {
-            throw new Exception("Arquivo inexistente");
-        }
+        divide[0] = divide[0].trim();
+        System.out.println(divide[0].equals("D:\\\\Users\\\\gtsa\\\\Documents\\\\Batat\\\\batato.txt"));
+//        if (!f.exists() || !f.canRead()) {
+//            throw new Exception("Arquivo inexistente");
+//        }
         //divide[1].trim();
         int janel = Integer.parseInt(divide[1]);
         ServidorSR sender = new ServidorSR(divide[0], port, janel);

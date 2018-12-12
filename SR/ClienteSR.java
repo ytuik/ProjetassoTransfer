@@ -9,23 +9,23 @@ import java.util.Random;
 public class ClienteSR {
 
     private static final int TAMANHO_BUFFER = 512;
-    private int moduloNumSeq;
+    private int ModuloNumSeq;
     
     private int base;
-    private int tamanho;
+    private int tamanho = 10;
     private int prob;
-    private Map<Integer, Pacote> map;//guarda o número de sequência e o pacote
+    private Map<Integer, Pacote> map;
 
     private DatagramSocket socket;
     private FileOutputStream fout;
 
     private InetAddress channelAddress;
     private int channelPort;
-    private boolean getChannelInfo;//para saber se já foi guardado o IP e porta
+    private boolean getChannelInfo;
 
-    public static boolean descarta() {//x é o número definido pelo usuário de 0 a 100
+    public static boolean descarta(int x) {//x Ã© o nÃºmero definido pelo usuÃ¡rio de 0 a 100
 	    Random gerador = new Random();
-    	if(this.prob >= gerador.nextInt(100)) return true;
+    	if(x > gerador.nextInt(100)) return true;
     	else return false;
     }
     
@@ -33,7 +33,7 @@ public class ClienteSR {
         this.socket = socket;
         this.fout = new FileOutputStream(file);
         this.tamanho = 10;
-        this.moduloNumSeq = 2 * this.tamanho;
+        this.ModuloNumSeq = 2 * this.tamanho;
         this.base = 0;
         this.getChannelInfo = false;
         this.map = new HashMap<>();
@@ -44,27 +44,27 @@ public class ClienteSR {
         this.socket = socket;
         this.fout = new FileOutputStream(file);
         this.tamanho = tamanho;
-        this.moduloNumSeq = 2 * tamanho;
+        this.ModuloNumSeq = 2 * tamanho;
         this.base = 0;
         this.getChannelInfo = false;
         this.map = new HashMap<>();
         this.prob = prob;
     }
 
-    // Checa se o # de sequencia está dentro da janela
+    // Checa se o # de sequencia estÃ¡ dentro da janela
     private boolean withinWindow(int ackNum) {
         int distance = ackNum - base;
         if (ackNum < base) {
-            distance += moduloNumSeq;
+            distance += ModuloNumSeq;
         }
         return distance < tamanho;
     }
 
-    // Checa se o # de sequencia está na janela anterior
+    // Checa se o # de sequencia estÃ¡ na janela anterior
     private boolean withinPrevWindow(int ackNum) {
         int distance = base - ackNum;
         if (base < ackNum) {
-            distance += moduloNumSeq;
+            distance += ModuloNumSeq;
         }
         return distance <= tamanho && distance > 0;
     }
@@ -78,10 +78,10 @@ public class ClienteSR {
         while (true) {
             // receive packet
             socket.receive(receiveDatagram);
-            if(!descarta()){//Caso seja descartado, o socket irá sobrescrever o anterior
+            if(!descarta(this.prob)){//Caso seja descartado, o socket irÃ¡ sobrescrever o anterior
                 Pacote pacote = Pacote.getPacote(receiveDatagram.getData());
 
-                // Obter as informações do emissor.
+                // Obter as informaÃ§Ãµes do emissor.
                 if (!getChannelInfo) {
                     channelAddress = receiveDatagram.getAddress();
                     channelPort = receiveDatagram.getPort();
@@ -89,7 +89,7 @@ public class ClienteSR {
                 }
 
                 if (pacote.getTipo() == 2) {
-                    // Acaba a transmissão se o pacote for tipo FYN
+                    // Acaba a transmissÃ£o se o pacote for tipo FYN
                     Util.endReceiverSession(pacote, channelAddress, channelPort, socket);
                     break;
 
@@ -102,22 +102,22 @@ public class ClienteSR {
                         // Manda ACK
                         Util.enviaACK(ackNum, channelAddress, channelPort, socket);
 
-                        // Se o pacote for novo é carregado no buffer
+                        // Se o pacote for novo Ã© carregado no buffer
                         if (!map.containsKey(ackNum)) {
                             map.put(ackNum, pacote);
                         }
 
-                        // Se o # de seq == base, avança a janela
+                        // Se o # de seq == base, avanÃ§a a janela
                         if (ackNum == base) {
                             while (map.containsKey(ackNum)) {
                                 fout.write(map.get(ackNum).getData());
                                 map.remove(ackNum);
-                                ackNum = (ackNum + 1) % moduloNumSeq;
+                                ackNum = (ackNum + 1) % ModuloNumSeq;
                             }
-                            base = ackNum % moduloNumSeq;
+                            base = ackNum % ModuloNumSeq;
                         }
                     } else if (withinPrevWindow(ackNum)) {
-                        // Se o pacote não estiver na janela, reenvia o ACK
+                        // Se o pacote nÃ£o estiver na janela, reenvia o ACK
                         Util.enviaACK(ackNum, channelAddress, channelPort, socket);
                     }
                 }

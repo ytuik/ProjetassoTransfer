@@ -43,7 +43,7 @@ public class ServidorSR {
         this.sendFinished = false;
     }
 
-    // Função que recebe os ACKs
+    // FunÃ§Ã£o que recebe os ACKs
     private void receivePackets() {
         byte[] buffer = new byte[TAMANHO_ACK];
         DatagramPacket receiveDatagram = new DatagramPacket(buffer, buffer.length);
@@ -51,7 +51,7 @@ public class ServidorSR {
 
         while (!sendFinished || !queue.isEmpty()) {
             try {
-                // Pega o número do ACK
+                // Pega o nÃºmero do ACK
                 socket.receive(receiveDatagram);
                 pacote = Pacote.getPacote(receiveDatagram.getData());
                 System.out.println(String.format("PKT RECV ACK %s %s", pacote.getTamanho(), pacote.getSeqNum()));
@@ -62,7 +62,7 @@ public class ServidorSR {
                     TimerPacket timerPacket = map.get(ackNum);
                     timerPacket.stopTimer();
 
-                    // Avança a janela se base == # do Ack
+                    // AvanÃ§a a janela se base == # do Ack
                     if (ackNum == base) {
                         while (!queue.isEmpty() && queue.peek().isAck()) {
                             timerPacket = queue.poll();
@@ -81,7 +81,7 @@ public class ServidorSR {
     public void start() throws Exception {
         socket = new DatagramSocket();
 
-        // Criação da thread que recebe os ACKs
+        // CriaÃ§Ã£o da thread que recebe os ACKs
         Thread receiveThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -90,7 +90,7 @@ public class ServidorSR {
         });
         receiveThread.start();
 
-        System.out.println("Começando a enviar os dados");
+        System.out.println("ComeÃ§ando a enviar os dados");
         while (true) {
             // Fazer cada pacote com seu timer
             byte[] buffer = new byte[TAMANHO_BUFFER];
@@ -103,21 +103,21 @@ public class ServidorSR {
             Pacote pacote = new Pacote(0, readNum + TAMANHO_CABECALHO, nextSeqNum, buffer);
             TimerPacket timerPacket = new TimerPacket(pacote);
 
-            // Manda o pacote e começa o timer
+            // Manda o pacote e comeÃ§a o timer
             available.acquire();
             queue.offer(timerPacket);
             map.put(nextSeqNum, timerPacket);
             timerPacket.startTimer();
             Util.enviaDados(pacote, channelAddress, port, socket);
 
-            // Atualiza o proximo número de sequencia
+            // Atualiza o proximo nÃºmero de sequencia
             nextSeqNum = (nextSeqNum + 1) % moduloNumSeq;
         }
 
         // Espera a thread acabar
         receiveThread.join();
 
-        // Finaliza a sessão
+        // Finaliza a sessÃ£o
         Util.endSenderSession(base, channelAddress, port, socket);
         System.out.println("Acabou de enviar os dados");
         socket.close();
