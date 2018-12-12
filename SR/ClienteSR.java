@@ -4,6 +4,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class ClienteSR {
 
@@ -11,20 +12,20 @@ public class ClienteSR {
     private int ModuloNumSeq;
     
     private int base;
-    private int tamanho = 10;
+    private int tamanho;
     private int prob;
-    private Map<Integer, Pacote> map;
+    private Map<Integer, Pacote> map;//guarda o número de sequência e o pacote
 
     private DatagramSocket socket;
     private FileOutputStream fout;
 
     private InetAddress channelAddress;
     private int channelPort;
-    private boolean getChannelInfo;
+    private boolean getChannelInfo;//para saber se já foi guardado o IP e porta
 
-    public static boolean descarta(int x) {//x é o número definido pelo usuário de 0 a 100
+    public static boolean descarta() {//x é o número definido pelo usuário de 0 a 100
 	    Random gerador = new Random();
-    	if(x > gerador.nextInt(100)) return true;
+    	if(this.prob >= gerador.nextInt(100)) return true;
     	else return false;
     }
     
@@ -77,7 +78,7 @@ public class ClienteSR {
         while (true) {
             // receive packet
             socket.receive(receiveDatagram);
-            if(!descarta(this.prob)){//Caso seja descartado, o socket irá sobrescrever o anterior
+            if(!descarta()){//Caso seja descartado, o socket irá sobrescrever o anterior
                 Pacote pacote = Pacote.getPacote(receiveDatagram.getData());
 
                 // Obter as informações do emissor.

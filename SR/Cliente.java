@@ -8,7 +8,7 @@ public class Cliente {
     public static void main(String[] args) throws Exception {
 
         Scanner s = new Scanner(System.in);
-        System.out.println("Deseja escolher o tamanho da janela? [1/0]");
+        System.out.println("Deseja escolher o tamanho da janela? [1/0]");// o padrão será 10
         int tamanho;
         boolean escolha;
         while (true) {
@@ -35,11 +35,11 @@ public class Cliente {
             if (prob < 100 && prob >= 0) {
                 break;
             }else{
-                System.out.println("Valor inválido, por favor, digite um número de 0 a 99.")
+                System.out.println("Valor inválido, por favor, digite um número de 0 a 99.");
             }
         }
 
-        System.out.println("Digite o nome do arquivo a ser criado:");
+        System.out.println("Digite o nome do arquivo a ser solicitado :");
         String fileName = s.nextLine();
 
         int port = 8001;
