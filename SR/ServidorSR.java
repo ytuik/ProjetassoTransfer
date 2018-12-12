@@ -35,7 +35,7 @@ public class ServidorSR {
         this.base = 0;
         this.nextSeqNum = 0;
         this.port = channelPort;
-        this.channelAddress = InetAddress.getByName("localhost");
+        this.channelAddress = InetAddress.getByName("172.20.4.139");//COLOQUE O IP DO CLIENTE AQUI
         this.moduloNumSeq = janela * 2;
         this.queue = new ArrayDeque<>();
         this.map = new HashMap<>();
