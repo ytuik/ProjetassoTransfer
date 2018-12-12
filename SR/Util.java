@@ -27,7 +27,7 @@ public class Util {
         }
     }
 
-    public static void enviaAck(int ackNum, InetAddress channelAddress, int channelPort, DatagramSocket socket)
+    public static void enviaACK(int ackNum, InetAddress channelAddress, int channelPort, DatagramSocket socket)
             throws Exception {
         Util.enviaPacote(Pacote.createACK(ackNum).getBytes(), channelAddress, channelPort, socket);
         System.out.println(String.format("PKT SEND ACK 12 %s", ackNum));
@@ -35,7 +35,7 @@ public class Util {
 
     public static void enviaDados(Pacote pacote, InetAddress channelAddress, int port, DatagramSocket socket) {
         Util.enviaPacote(pacote.getBytes(), channelAddress, port, socket);
-        System.out.println(String.format("PKT SEND DAT %s %s", pacote.getLength(), pacote.getSeqNum()));
+        System.out.println(String.format("PKT SEND DAT %s %s", pacote.getTamanho(), pacote.getSeqNum()));
     }
 
     public static void endSenderSession(int seqNum, InetAddress channelAddress, int port, DatagramSocket socket)
@@ -47,10 +47,10 @@ public class Util {
         // wait for FYN
         while (true) {
             Pacote pacote = Util.recebePacote(ACK_SIZE, socket);
-            if (pacote.getType() == 2) {
+            if (pacote.getTipo() == 2) {
                 System.out.println("PKT RECV FYN 12 " + pacote.getSeqNum());
                 break;
-            } else if (pacote.getType() == 1) {
+            } else if (pacote.getTipo() == 1) {
                 System.out.println("PKT RECV ACK 12 " + pacote.getSeqNum());
             }
         }

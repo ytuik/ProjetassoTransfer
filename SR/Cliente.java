@@ -3,15 +3,14 @@ import java.io.IOException;
 import java.net.*;
 import java.util.Scanner;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
-public class Cliente2 {
+public class Cliente {
     public static void main(String[] args) throws Exception {
 
         Scanner s = new Scanner(System.in);
         System.out.println("Deseja escolher o tamanho da janela? [1/0]");
         int tamanho;
-        Bool escolha;
+        boolean escolha;
         while (true) {
             tamanho = s.nextInt();
             if (tamanho == 1) {
@@ -43,12 +42,12 @@ public class Cliente2 {
 
         int port = 8001;
         DatagramSocket socket = new DatagramSocket(port);
+        ClienteSR receiver;
         if (escolha) {
-            SRReceiver receiver = new SRReceiver(socket, fileName, tamanho);
+            receiver = new ClienteSR(socket, fileName, tamanho);
         } else {
-            SRReceiver receiver = new SRReceiver(socket, fileName);
+            receiver = new ClienteSR(socket, fileName);
         }
-
         receiver.start();
     }
 

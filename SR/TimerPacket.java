@@ -21,14 +21,14 @@ public class TimerPacket {
                 if (!ack) {
                     byte[] sendData = pacote.getBytes();
                     DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
-                            SRSender.channelAddress, SRSender.port);
+                            ServidorSR.channelAddress, ServidorSR.port);
                     try {
-                        SRSender.socket.send(sendPacket);
+                        ServidorSR.socket.send(sendPacket);
                     } catch (IOException e) {
                         System.out.println("IOException when TimerPacket sending packet");
                     }
-                    System.out.println(String.format("PKT SEND DAT %s %s", pacote.getLength(), pacote.getSeqNum()));
-                    timer.schedule(new TimeoutTask(), SRSender.timeout);
+                    System.out.println(String.format("PKT SEND DAT %s %s", pacote.getTamanho(), pacote.getSeqNum()));
+                    timer.schedule(new TimeoutTask(), 50); // 50 é um valor temporario, até a gente achar um timeout melhor.
                 }
             }
         }
@@ -44,7 +44,7 @@ public class TimerPacket {
 
     public void startTimer() {
         timer = new Timer();
-        timer.schedule(new TimeoutTask(), SRSender.timeout);
+        timer.schedule(new TimeoutTask(), 50); // 50 é um valor temporario, até a gente achar um timeout melhor.
     }
 
     public void stopTimer() {

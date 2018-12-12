@@ -68,21 +68,21 @@ public class ClienteSR {
             socket.receive(receiveDatagram);
             Pacote pacote = Pacote.getPacote(receiveDatagram.getData());
 
-            // get channel info
+            // Obter as informações do emissor.
             if (!getChannelInfo) {
                 channelAddress = receiveDatagram.getAddress();
                 channelPort = receiveDatagram.getPort();
                 getChannelInfo = true;
             }
 
-            if (pacote.getType() == 2) {
+            if (pacote.getTipo() == 2) {
                 // end receiver session when receiving EOT
                 Util.endReceiverSession(pacote, channelAddress, channelPort, socket);
                 break;
 
-            } else if (pacote.getType() == 0) {
+            } else if (pacote.getTipo() == 0) {
                 // process data packet
-                System.out.println(String.format("PKT RECV DAT %s %s", pacote.getLength(), pacote.getSeqNum()));
+                System.out.println(String.format("PKT RECV DAT %s %s", pacote.getTamanho(), pacote.getSeqNum()));
                 int ackNum = pacote.getSeqNum();
                 if (withinWindow(ackNum)) {
                     // send ACK back to sender

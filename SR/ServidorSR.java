@@ -30,11 +30,11 @@ public class ServidorSR {
 
     private volatile boolean sendFinished;
 
-    public ServidorSR(String file, String hostname, int channelPort) throws Exception {
+    public ServidorSR(String file, int channelPort) throws Exception {
         base = 0;
         nextSeqNum = 0;
         port = channelPort;
-        channelAddress = InetAddress.getByName(hostname);
+        channelAddress = InetAddress.getByName("localhost");
         queue = new ArrayDeque<>();
         map = new HashMap<>();
         fileStream = new FileInputStream(file);
@@ -51,7 +51,7 @@ public class ServidorSR {
                 // get ack number
                 socket.receive(receiveDatagram);
                 pacote = Pacote.getPacote(receiveDatagram.getData());
-                System.out.println(String.format("PKT RECV ACK %s %s", pacote.getLength(), pacote.getSeqNum()));
+                System.out.println(String.format("PKT RECV ACK %s %s", pacote.getTamanho(), pacote.getSeqNum()));
                 int ackNum = pacote.getSeqNum();
 
                 // mark that packet as having been received in the window

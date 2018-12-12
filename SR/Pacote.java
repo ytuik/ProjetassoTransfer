@@ -10,13 +10,13 @@ public class Pacote {
     private byte[] dados;
 
     public Pacote(int tipo, int tamanho, int seqNum, byte[] dados) throws Exception {
-        if (length > TAMANHO_MAXIMO) {
+        if (tamanho > TAMANHO_MAXIMO) {
             throw new Exception("Pacote muito grande");
         }
         this.tipo = tipo;
-        this.tamanho = length;
+        this.tamanho = tamanho;
         this.seqNum = seqNum;
-        this.dados = data;
+        this.dados = dados;
     }
 
     public static Pacote createACK(int seqNum) throws Exception {
