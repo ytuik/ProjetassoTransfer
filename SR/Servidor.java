@@ -13,9 +13,9 @@ public class Servidor {
         InetAddress clientIP;
         DatagramPacket receivePacket=new DatagramPacket(receiveData,receiveData.length);
         serverSocket.receive(receivePacket);
-        String fiilexWin = new String(receiveData, "UTF-8");
-        fiilexWin.trim();
-        String[] divide = fiilexWin.split("#");
+        String filexWin = new String(receiveData, "UTF-8");
+        filexWin = filexWin.trim();
+        String[] divide = filexWin.split("#");
         System.out.println("Tamanho da janela: "+divide[1]);
         System.out.println("Nome do arquivo solicitado: "+ divide[0]);
         
@@ -26,8 +26,9 @@ public class Servidor {
         if (!f.exists() || !f.canRead()) {
             throw new Exception("Arquivo inexistente");
         }
-
-        ServidorSR sender = new ServidorSR(divide[0], port, Integer.parseInt(divide[1]));
+        //divide[1].trim();
+        int janel = Integer.parseInt(divide[1]);
+        ServidorSR sender = new ServidorSR(divide[0], port, janel);
         sender.start();
     }
 }
