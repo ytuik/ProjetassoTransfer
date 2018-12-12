@@ -9,7 +9,7 @@ import java.util.Random;
 public class ClienteSR {
 
     private static final int TAMANHO_BUFFER = 512;
-    private int ModuloNumSeq;
+    private int moduloNumSeq;
     
     private int base;
     private int tamanho;
@@ -44,7 +44,7 @@ public class ClienteSR {
         this.socket = socket;
         this.fout = new FileOutputStream(file);
         this.tamanho = tamanho;
-        this.ModuloNumSeq = 2 * tamanho;
+        this.moduloNumSeq = 2 * tamanho;
         this.base = 0;
         this.getChannelInfo = false;
         this.map = new HashMap<>();
@@ -55,7 +55,7 @@ public class ClienteSR {
     private boolean withinWindow(int ackNum) {
         int distance = ackNum - base;
         if (ackNum < base) {
-            distance += ModuloNumSeq;
+            distance += moduloNumSeq;
         }
         return distance < tamanho;
     }
@@ -64,7 +64,7 @@ public class ClienteSR {
     private boolean withinPrevWindow(int ackNum) {
         int distance = base - ackNum;
         if (base < ackNum) {
-            distance += ModuloNumSeq;
+            distance += moduloNumSeq;
         }
         return distance <= tamanho && distance > 0;
     }
@@ -112,9 +112,9 @@ public class ClienteSR {
                             while (map.containsKey(ackNum)) {
                                 fout.write(map.get(ackNum).getData());
                                 map.remove(ackNum);
-                                ackNum = (ackNum + 1) % ModuloNumSeq;
+                                ackNum = (ackNum + 1) % moduloNumSeq;
                             }
-                            base = ackNum % ModuloNumSeq;
+                            base = ackNum % moduloNumSeq;
                         }
                     } else if (withinPrevWindow(ackNum)) {
                         // Se o pacote não estiver na janela, reenvia o ACK
