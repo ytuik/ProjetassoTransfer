@@ -6,62 +6,62 @@ public class Util {
 
     private static final int ACK_SIZE = 12;
 
-    public static void sendPacket(byte[] bytes, InetAddress address, int port, DatagramSocket socket) {
+    public static void enviaPacote(byte[] bytes, InetAddress address, int port, DatagramSocket socket) {
         try {
-            DatagramPacket sendPacket = new DatagramPacket(bytes, bytes.length, address, port);
-            socket.send(sendPacket);
+            DatagramPacket enviaPacote = new DatagramPacket(bytes, bytes.length, address, port);
+            socket.send(enviaPacote);
         } catch (Exception e) {
-            System.out.println("Exception when sending packet");
+            System.out.println("Exception when sending pacote");
         }
     }
 
-    public static Packet receivePacket(int bufferSize, DatagramSocket socket) throws Exception {
+    public static Pacote recebePacote(int bufferSize, DatagramSocket socket) throws Exception {
         try {
             byte[] buffer = new byte[bufferSize];
             DatagramPacket receiveDatagram = new DatagramPacket(buffer, buffer.length);
             socket.receive(receiveDatagram);
-            return Packet.getPacket(receiveDatagram.getData());
+            return Pacote.getPacote(receiveDatagram.getData());
         } catch (Exception e) {
-            System.out.println("Exception when receiving packet");
+            System.out.println("Exception when receiving pacote");
             throw e;
         }
     }
 
-    public static void sendACK(int ackNum, InetAddress channelAddress, int channelPort, DatagramSocket socket)
+    public static void enviaAck(int ackNum, InetAddress channelAddress, int channelPort, DatagramSocket socket)
             throws Exception {
-        Util.sendPacket(Packet.createACK(ackNum).getBytes(), channelAddress, channelPort, socket);
+        Util.enviaPacote(Pacote.createACK(ackNum).getBytes(), channelAddress, channelPort, socket);
         System.out.println(String.format("PKT SEND ACK 12 %s", ackNum));
     }
 
-    public static void sendData(Packet packet, InetAddress channelAddress, int port, DatagramSocket socket) {
-        Util.sendPacket(packet.getBytes(), channelAddress, port, socket);
-        System.out.println(String.format("PKT SEND DAT %s %s", packet.getLength(), packet.getSeqNum()));
+    public static void enviaDados(Pacote pacote, InetAddress channelAddress, int port, DatagramSocket socket) {
+        Util.enviaPacote(pacote.getBytes(), channelAddress, port, socket);
+        System.out.println(String.format("PKT SEND DAT %s %s", pacote.getLength(), pacote.getSeqNum()));
     }
 
     public static void endSenderSession(int seqNum, InetAddress channelAddress, int port, DatagramSocket socket)
             throws Exception {
-        // send EOT
-        sendPacket(Packet.createEOT(seqNum).getBytes(), channelAddress, port, socket);
-        System.out.println("PKT SEND EOT 12 " + seqNum);
+        // send FYN
+        enviaPacote(Pacote.createFYN(seqNum).getBytes(), channelAddress, port, socket);
+        System.out.println("PKT SEND FYN 12 " + seqNum);
 
-        // wait for EOT
+        // wait for FYN
         while (true) {
-            Packet packet = Util.receivePacket(ACK_SIZE, socket);
-            if (packet.getType() == 2) {
-                System.out.println("PKT RECV EOT 12 " + packet.getSeqNum());
+            Pacote pacote = Util.recebePacote(ACK_SIZE, socket);
+            if (pacote.getType() == 2) {
+                System.out.println("PKT RECV FYN 12 " + pacote.getSeqNum());
                 break;
-            } else if (packet.getType() == 1) {
-                System.out.println("PKT RECV ACK 12 " + packet.getSeqNum());
+            } else if (pacote.getType() == 1) {
+                System.out.println("PKT RECV ACK 12 " + pacote.getSeqNum());
             }
         }
     }
 
-    public static void endReceiverSession(Packet packet, InetAddress channelAddress, int channelPort,
+    public static void endReceiverSession(Pacote pacote, InetAddress channelAddress, int channelPort,
             DatagramSocket socket) throws Exception {
-        System.out.println(String.format("PKT RECV EOT %s %s", packet.getLength(), packet.getSeqNum()));
+        System.out.println(String.format("PKT RECV FYN %s %s", pacote.getTamanho(), pacote.getSeqNum()));
 
-        // reply EOT
-        Util.sendPacket(Packet.createEOT(packet.getSeqNum()).getBytes(), channelAddress, channelPort, socket);
-        System.out.println("PKT SEND EOT 12 " + packet.getSeqNum());
+        // reply FYN
+        Util.enviaPacote(Pacote.createFYN(pacote.getSeqNum()).getBytes(), channelAddress, channelPort, socket);
+        System.out.println("PKT SEND FYN 12 " + pacote.getSeqNum());
     }
 }

@@ -1,38 +1,38 @@
 import java.nio.ByteBuffer;
 
 public class Pacote {
-    private static final int MAX_SIZE = 512;
-    private static final int HEADER_SIZE = 12;
+    private static final int TAMANHO_MAXIMO = 512;
+    private static final int TAMANHO_CABECALHO = 12;
 
-    private int type;
-    private int length;
+    private int tipo; // 0 = Dado. 1 = ACK. 2 = FYN.
+    private int tamanho;
     private int seqNum;
-    private byte[] data;
+    private byte[] dados;
 
-    Pacote(int type, int length, int seqNum, byte[] data) throws Exception {
-        if (length > MAX_SIZE) {
-            throw new Exception("too large packet (max size 512)");
+    public Pacote(int tipo, int tamanho, int seqNum, byte[] dados) throws Exception {
+        if (length > TAMANHO_MAXIMO) {
+            throw new Exception("Pacote muito grande");
         }
-        this.type = type;
-        this.length = length;
+        this.tipo = tipo;
+        this.tamanho = length;
         this.seqNum = seqNum;
-        this.data = data;
+        this.dados = data;
     }
 
     public static Pacote createACK(int seqNum) throws Exception {
-        return new Packet(1, HEADER_SIZE, seqNum, new byte[0]);
+        return new Pacote(1, TAMANHO_CABECALHO, seqNum, new byte[0]);
     }
 
-    public static Pacote createEOT(int seqNum) throws Exception {
-        return new Packet(2, HEADER_SIZE, seqNum, new byte[0]);
+    public static Pacote createFYN(int seqNum) throws Exception {
+        return new Pacote(2, TAMANHO_CABECALHO, seqNum, new byte[0]);
     }
 
-    public int getType() {
-        return type;
+    public int getTipo() {
+        return tipo;
     }
 
-    public int getLength() {
-        return length;
+    public int getTamanho() {
+        return tamanho;
     }
 
     public int getSeqNum() {
@@ -40,29 +40,29 @@ public class Pacote {
     }
 
     public byte[] getData() {
-        return data;
+        return dados;
     }
 
     public byte[] getBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(length);
-        buffer.putInt(type);
-        buffer.putInt(length);
+        ByteBuffer buffer = ByteBuffer.allocate(tamanho);
+        buffer.putInt(tipo);
+        buffer.putInt(tamanho);
         buffer.putInt(seqNum);
-        buffer.put(data, 0, length - HEADER_SIZE);
+        buffer.put(dados, 0, tamanho - TAMANHO_CABECALHO);
         return buffer.array();
     }
 
-    public static Pacote getPacket(byte[] bytes) throws Exception {
+    public static Pacote getPacote(byte[] bytes) throws Exception {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        int type = buffer.getInt();
-        int length = buffer.getInt();
+        int tipo = buffer.getInt(); // Lê os 4 primeiros bytes, e incrementa o offset em 4
+        int tamanho = buffer.getInt();
         int seqNum = buffer.getInt();
-        if (length > HEADER_SIZE) {
-            byte[] data = new byte[length - HEADER_SIZE];
-            buffer.get(data, 0, length - HEADER_SIZE);
-            return new Packet(type, length, seqNum, data);
+        if (tamanho > TAMANHO_CABECALHO) {
+            byte[] data = new byte[tamanho - TAMANHO_CABECALHO];
+            buffer.get(data, 0, tamanho - TAMANHO_CABECALHO);
+            return new Pacote(tipo, tamanho, seqNum, data);
         } else {
-            return new Packet(type, length, seqNum, new byte[0]);
+            return new Pacote(tipo, tamanho, seqNum, new byte[0]);
         }
     }
 }

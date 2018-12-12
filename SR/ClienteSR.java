@@ -12,7 +12,7 @@ public class ClienteSR {
     
     private int base;
     private int tamanho = 10;
-    private Map<Integer, Packet> map;
+    private Map<Integer, Pacote> map;
 
     private DatagramSocket socket;
     private FileOutputStream fout;
@@ -66,7 +66,7 @@ public class ClienteSR {
         while (true) {
             // receive packet
             socket.receive(receiveDatagram);
-            Packet packet = Packet.getPacket(receiveDatagram.getData());
+            Pacote pacote = Pacote.getPacote(receiveDatagram.getData());
 
             // get channel info
             if (!getChannelInfo) {
@@ -75,22 +75,22 @@ public class ClienteSR {
                 getChannelInfo = true;
             }
 
-            if (packet.getType() == 2) {
+            if (pacote.getType() == 2) {
                 // end receiver session when receiving EOT
-                Util.endReceiverSession(packet, channelAddress, channelPort, socket);
+                Util.endReceiverSession(pacote, channelAddress, channelPort, socket);
                 break;
 
-            } else if (packet.getType() == 0) {
+            } else if (pacote.getType() == 0) {
                 // process data packet
-                System.out.println(String.format("PKT RECV DAT %s %s", packet.getLength(), packet.getSeqNum()));
-                int ackNum = packet.getSeqNum();
+                System.out.println(String.format("PKT RECV DAT %s %s", pacote.getLength(), pacote.getSeqNum()));
+                int ackNum = pacote.getSeqNum();
                 if (withinWindow(ackNum)) {
                     // send ACK back to sender
-                    Util.sendACK(ackNum, channelAddress, channelPort, socket);
+                    Util.enviaACK(ackNum, channelAddress, channelPort, socket);
 
                     // if the packet is not previously received, it is buffered
                     if (!map.containsKey(ackNum)) {
-                        map.put(ackNum, packet);
+                        map.put(ackNum, pacote);
                     }
 
                     // if ackNum == base, move forward the window
@@ -104,7 +104,7 @@ public class ClienteSR {
                     }
                 } else if (withinPrevWindow(ackNum)) {
                     // if the packet falls in receiver's previous window, send back ACK
-                    Util.sendACK(ackNum, channelAddress, channelPort, socket);
+                    Util.enviaACK(ackNum, channelAddress, channelPort, socket);
                 }
             }
         }

@@ -44,15 +44,15 @@ public class ServidorSR {
     private void receivePackets() {
         byte[] buffer = new byte[TAMANHO_ACK];
         DatagramPacket receiveDatagram = new DatagramPacket(buffer, buffer.length);
-        Packet packet;
+        Pacote pacote;
 
         while (!sendFinished || !queue.isEmpty()) {
             try {
                 // get ack number
                 socket.receive(receiveDatagram);
-                packet = Packet.getPacket(receiveDatagram.getData());
-                System.out.println(String.format("PKT RECV ACK %s %s", packet.getLength(), packet.getSeqNum()));
-                int ackNum = packet.getSeqNum();
+                pacote = Pacote.getPacote(receiveDatagram.getData());
+                System.out.println(String.format("PKT RECV ACK %s %s", pacote.getLength(), pacote.getSeqNum()));
+                int ackNum = pacote.getSeqNum();
 
                 // mark that packet as having been received in the window
                 if (map.containsKey(ackNum)) {
@@ -63,10 +63,10 @@ public class ServidorSR {
                     if (ackNum == base) {
                         while (!queue.isEmpty() && queue.peek().isAck()) {
                             timerPacket = queue.poll();
-                            map.remove(timerPacket.getPacket().getSeqNum());
+                            map.remove(timerPacket.getPacote().getSeqNum());
                             available.release();
                         }
-                        base = (timerPacket.getPacket().getSeqNum() + 1) % SEQNUM_MODULO;
+                        base = (timerPacket.getPacote().getSeqNum() + 1) % SEQNUM_MODULO;
                     }
                 }
 
@@ -100,15 +100,15 @@ public class ServidorSR {
                 sendFinished = true;
                 break;
             }
-            Packet packet = new Packet(0, readNum + TAMANHO_CABECALHO, nextSeqNum, buffer);
-            TimerPacket timerPacket = new TimerPacket(packet);
+            Pacote pacote = new Pacote(0, readNum + TAMANHO_CABECALHO, nextSeqNum, buffer);
+            TimerPacket timerPacket = new TimerPacket(pacote);
 
             // send the packet and start its timer
             available.acquire();
             queue.offer(timerPacket);
             map.put(nextSeqNum, timerPacket);
             timerPacket.startTimer();
-            Util.sendData(packet, channelAddress, port, socket);
+            Util.enviaDados(pacote, channelAddress, port, socket);
 
             // update nextSeqNum
             nextSeqNum = (nextSeqNum + 1) % SEQNUM_MODULO;

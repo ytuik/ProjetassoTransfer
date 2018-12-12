@@ -4,13 +4,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class TimerPacket {
-    private Packet packet;
+    private Pacote pacote;
     private Timer timer;
     private boolean ack;
     private final Object lock;
 
-    TimerPacket(Packet packet) {
-        this.packet = packet;
+    TimerPacket(Pacote pacote) {
+        this.pacote = pacote;
         ack = false;
         lock = new Object();
     }
@@ -19,7 +19,7 @@ public class TimerPacket {
         public void run() {
             synchronized (lock) {
                 if (!ack) {
-                    byte[] sendData = packet.getBytes();
+                    byte[] sendData = pacote.getBytes();
                     DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
                             SRSender.channelAddress, SRSender.port);
                     try {
@@ -27,15 +27,15 @@ public class TimerPacket {
                     } catch (IOException e) {
                         System.out.println("IOException when TimerPacket sending packet");
                     }
-                    System.out.println(String.format("PKT SEND DAT %s %s", packet.getLength(), packet.getSeqNum()));
+                    System.out.println(String.format("PKT SEND DAT %s %s", pacote.getLength(), pacote.getSeqNum()));
                     timer.schedule(new TimeoutTask(), SRSender.timeout);
                 }
             }
         }
     }
 
-    public Packet getPacket() {
-        return packet;
+    public Pacote getPacote() {
+        return pacote;
     }
 
     public boolean isAck() {
