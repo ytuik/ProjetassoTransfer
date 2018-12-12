@@ -8,7 +8,7 @@ import java.util.Map;
 public class ClienteSR {
 
     private static final int TAMANHO_BUFFER = 512;
-    private static final int SEQNUM_MODULO = 256;
+    private int ModuloNumSeq;
     
     private int base;
     private int tamanho = 10;
@@ -23,36 +23,38 @@ public class ClienteSR {
 
     public ClienteSR(DatagramSocket socket, String file) throws Exception {
         this.socket = socket;
-        fout = new FileOutputStream(file);
-        tamanho = 10;
-        base = 0;
-        getChannelInfo = false;
-        map = new HashMap<>();
+        this.fout = new FileOutputStream(file);
+        this.tamanho = 10;
+        this.moduloNumSeq = 2 * this.tamanho;
+        this.base = 0;
+        this.getChannelInfo = false;
+        this.map = new HashMap<>();
     }
 
     public ClienteSR(DatagramSocket socket, String file, int tamanho) throws Exception {
         this.socket = socket;
         this.fout = new FileOutputStream(file);
         this.tamanho = tamanho;
+        this.ModuloNumSeq = 2 * tamanho;
         this.base = 0;
         this.getChannelInfo = false;
         this.map = new HashMap<>();
     }
 
-    // check if ackNum falls in the receiver's window
+    // Checa se o # de sequencia está dentro da janela
     private boolean withinWindow(int ackNum) {
         int distance = ackNum - base;
         if (ackNum < base) {
-            distance += SEQNUM_MODULO;
+            distance += ModuloNumSeq;
         }
         return distance < tamanho;
     }
 
-    // check if ackNum falls in receiver's previous window
+    // Checa se o # de sequencia está na janela anterior
     private boolean withinPrevWindow(int ackNum) {
         int distance = base - ackNum;
         if (base < ackNum) {
-            distance += SEQNUM_MODULO;
+            distance += ModuloNumSeq;
         }
         return distance <= tamanho && distance > 0;
     }
@@ -76,40 +78,40 @@ public class ClienteSR {
             }
 
             if (pacote.getTipo() == 2) {
-                // end receiver session when receiving EOT
+                // Acaba a transmissão se o pacote for tipo FYN
                 Util.endReceiverSession(pacote, channelAddress, channelPort, socket);
                 break;
 
             } else if (pacote.getTipo() == 0) {
                 // process data packet
-                System.out.println(String.format("PKT RECV DAT %s %s", pacote.getTamanho(), pacote.getSeqNum()));
+                // System.out.println(String.format("PKT RECV DAT %s %s", pacote.getTamanho(), pacote.getSeqNum()));
                 int ackNum = pacote.getSeqNum();
+                // Se o # de sequencia estiver dentro da janela 
                 if (withinWindow(ackNum)) {
-                    // send ACK back to sender
+                    // Manda ACK
                     Util.enviaACK(ackNum, channelAddress, channelPort, socket);
 
-                    // if the packet is not previously received, it is buffered
+                    // Se o pacote for novo é carregado no buffer
                     if (!map.containsKey(ackNum)) {
                         map.put(ackNum, pacote);
                     }
 
-                    // if ackNum == base, move forward the window
+                    // Se o # de seq == base, avança a janela
                     if (ackNum == base) {
                         while (map.containsKey(ackNum)) {
                             fout.write(map.get(ackNum).getData());
                             map.remove(ackNum);
-                            ackNum = (ackNum + 1) % SEQNUM_MODULO;
+                            ackNum = (ackNum + 1) % ModuloNumSeq;
                         }
-                        base = ackNum % SEQNUM_MODULO;
+                        base = ackNum % ModuloNumSeq;
                     }
                 } else if (withinPrevWindow(ackNum)) {
-                    // if the packet falls in receiver's previous window, send back ACK
+                    // Se o pacote não estiver na janela, reenvia o ACK
                     Util.enviaACK(ackNum, channelAddress, channelPort, socket);
                 }
             }
         }
-        // close socket and file outputstream
-        System.out.println("Finish receiving file");
+        System.out.println("Acabou de receber o arquivo");
         fout.close();
         socket.close();
     }

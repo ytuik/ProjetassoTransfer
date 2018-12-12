@@ -5,6 +5,8 @@ public class Servidor {
     public static void main(String[] args) throws Exception {
 
         Scanner s = new Scanner(System.in);
+        System.out.println("Digite o tamanho da janela:");
+        int j = s.nextInt();
         System.out.println("Digite o nome do arquivo que deseja mandar:");
         String fileName = s.nextLine();
         
@@ -16,9 +18,7 @@ public class Servidor {
             throw new Exception("Arquivo inexistente");
         }
 
-        // use appropriate protocol type to send file data
-        System.out.println("SR protocol");
-        ServidorSR sender = new ServidorSR(fileName, port);
+        ServidorSR sender = new ServidorSR(fileName, port, j);
         sender.start();
     }
 }

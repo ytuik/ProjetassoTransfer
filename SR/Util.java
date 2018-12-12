@@ -40,7 +40,7 @@ public class Util {
 
     public static void endSenderSession(int seqNum, InetAddress channelAddress, int port, DatagramSocket socket)
             throws Exception {
-        // send FYN
+        // envia FYN
         enviaPacote(Pacote.createFYN(seqNum).getBytes(), channelAddress, port, socket);
         System.out.println("PKT SEND FYN 12 " + seqNum);
 

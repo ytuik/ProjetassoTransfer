@@ -13,7 +13,7 @@ public class ServidorSR {
     private static final int TAMANHO_ACK = 12;
     private static final int TAMANHO_BUFFER = 500;
     private static final int TAMANHO_CABECALHO = 12;
-    private static final int SEQNUM_MODULO = 256;
+    
     private final Semaphore available = new Semaphore(10);
 
     private FileInputStream fileStream;
@@ -27,20 +27,23 @@ public class ServidorSR {
 
     private int base;
     private int nextSeqNum;
+    private int moduloNumSeq;
 
     private volatile boolean sendFinished;
 
-    public ServidorSR(String file, int channelPort) throws Exception {
-        base = 0;
-        nextSeqNum = 0;
-        port = channelPort;
-        channelAddress = InetAddress.getByName("localhost");
-        queue = new ArrayDeque<>();
-        map = new HashMap<>();
-        fileStream = new FileInputStream(file);
-        sendFinished = false;
+    public ServidorSR(String file, int channelPort, int janela) throws Exception {
+        this.base = 0;
+        this.nextSeqNum = 0;
+        this.port = channelPort;
+        this.channelAddress = InetAddress.getByName("localhost");
+        this.moduloNumSeq = janela * 2;
+        this.queue = new ArrayDeque<>();
+        this.map = new HashMap<>();
+        this.fileStream = new FileInputStream(file);
+        this.sendFinished = false;
     }
 
+    // Função que recebe os ACKs
     private void receivePackets() {
         byte[] buffer = new byte[TAMANHO_ACK];
         DatagramPacket receiveDatagram = new DatagramPacket(buffer, buffer.length);
@@ -48,40 +51,37 @@ public class ServidorSR {
 
         while (!sendFinished || !queue.isEmpty()) {
             try {
-                // get ack number
+                // Pega o número do ACK
                 socket.receive(receiveDatagram);
                 pacote = Pacote.getPacote(receiveDatagram.getData());
                 System.out.println(String.format("PKT RECV ACK %s %s", pacote.getTamanho(), pacote.getSeqNum()));
                 int ackNum = pacote.getSeqNum();
 
-                // mark that packet as having been received in the window
+                // Marca o pacote como recebido na janela
                 if (map.containsKey(ackNum)) {
                     TimerPacket timerPacket = map.get(ackNum);
                     timerPacket.stopTimer();
 
-                    // move forward the window if ackNum == base
+                    // Avança a janela se base == # do Ack
                     if (ackNum == base) {
                         while (!queue.isEmpty() && queue.peek().isAck()) {
                             timerPacket = queue.poll();
                             map.remove(timerPacket.getPacote().getSeqNum());
                             available.release();
                         }
-                        base = (timerPacket.getPacote().getSeqNum() + 1) % SEQNUM_MODULO;
+                        base = (timerPacket.getPacote().getSeqNum() + 1) % moduloNumSeq;
                     }
                 }
-
             } catch (Exception e) {
-                System.out.println("Exception when receiving datagram packet");
+                System.out.println(e.getMessage());
             }
         }
     }
 
     public void start() throws Exception {
-
-        // create socket to send and receive data
         socket = new DatagramSocket();
 
-        // create new thread to receive ACK packets
+        // Criação da thread que recebe os ACKs
         Thread receiveThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -90,12 +90,12 @@ public class ServidorSR {
         });
         receiveThread.start();
 
-        // send file data
-        System.out.println("Start to send file data");
+        System.out.println("Começando a enviar os dados");
         while (true) {
-            // make packet with individual timer
+            // Fazer cada pacote com seu timer
             byte[] buffer = new byte[TAMANHO_BUFFER];
             int readNum = fileStream.read(buffer, 0, TAMANHO_BUFFER);
+            // Quando readNum == -1 significa que terminou de enviar o arquivo
             if (readNum < 0) {
                 sendFinished = true;
                 break;
@@ -103,23 +103,23 @@ public class ServidorSR {
             Pacote pacote = new Pacote(0, readNum + TAMANHO_CABECALHO, nextSeqNum, buffer);
             TimerPacket timerPacket = new TimerPacket(pacote);
 
-            // send the packet and start its timer
+            // Manda o pacote e começa o timer
             available.acquire();
             queue.offer(timerPacket);
             map.put(nextSeqNum, timerPacket);
             timerPacket.startTimer();
             Util.enviaDados(pacote, channelAddress, port, socket);
 
-            // update nextSeqNum
-            nextSeqNum = (nextSeqNum + 1) % SEQNUM_MODULO;
+            // Atualiza o proximo número de sequencia
+            nextSeqNum = (nextSeqNum + 1) % moduloNumSeq;
         }
 
-        // join the receive thread
+        // Espera a thread acabar
         receiveThread.join();
 
-        // end sender session
+        // Finaliza a sessão
         Util.endSenderSession(base, channelAddress, port, socket);
-        System.out.println("Finish sending file");
+        System.out.println("Acabou de enviar os dados");
         socket.close();
         fileStream.close();
     }
