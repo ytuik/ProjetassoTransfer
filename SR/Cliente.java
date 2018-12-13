@@ -42,27 +42,29 @@ public class Cliente {
         System.out.println("Digite o nome do arquivo a ser criado :");
         String fileName = s.nextLine();
 
-        int port = 8001;
+        int port = 1235;
         DatagramSocket socket = new DatagramSocket(port);
         ClienteSR receiver;
         if (escolha) {
-        	InetAddress IPServer = InetAddress.getByName("172.20.4.140");//Coloque o IP do Server aqui
+        	InetAddress IPServer = InetAddress.getByName("172.20.4.71");//Coloque o IP do Server aqui
         	String aux = fileName + "#" + tamanho;
         	byte[] sendData = aux.getBytes();
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,IPServer, 5000);
             clientSocket.send(sendPacket);
+            fileName = "C:\\Users\\lsm5\\Desktop\\" + fileName; //onde o arquivo irá chegar //trocar apenas o usuário
             int winSize = Integer.parseInt(tamanho);
             receiver = new ClienteSR(socket, fileName,winSize, prob);
         } else {
-        	InetAddress IPServer = InetAddress.getByName("172.20.4.140");//Coloque o IP do Server aqui
+        	InetAddress IPServer = InetAddress.getByName("172.20.4.71");//Coloque o IP do Server aqui
             String aux = fileName + "#10";
             byte[] sendData = aux.getBytes();
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,IPServer, 5000);
             clientSocket.send(sendPacket);
+            fileName = "C:\\Users\\lsm5\\Desktop\\" + fileName; //onde o arquivo irá chegar
             receiver = new ClienteSR(socket, fileName, prob);
         }
         receiver.start();
     }
 
 }
-// D:\\Users\\gtsa\\Documents\\Batat\\batato.txt
+// fileC:\\Users\\lsm5\\Desktop\\batato.txt

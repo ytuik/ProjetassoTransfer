@@ -23,7 +23,7 @@ public class ClienteSR {
     private int channelPort;
     private boolean getChannelInfo;
 
-    public static boolean descarta(int x) {//x Ã© o nÃºmero definido pelo usuÃ¡rio de 0 a 100
+    public static boolean descarta(int x) {//x ÃƒÂ© o nÃƒÂºmero definido pelo usuÃƒÂ¡rio de 0 a 100
 	    Random gerador = new Random();
     	if(x > gerador.nextInt(100)) return true;
     	else return false;
@@ -51,7 +51,7 @@ public class ClienteSR {
         this.prob = prob;
     }
 
-    // Checa se o # de sequencia estÃ¡ dentro da janela
+    // Checa se o # de sequencia estÃƒÂ¡ dentro da janela
     private boolean withinWindow(int ackNum) {
         int distance = ackNum - base;
         if (ackNum < base) {
@@ -60,7 +60,7 @@ public class ClienteSR {
         return distance < tamanho;
     }
 
-    // Checa se o # de sequencia estÃ¡ na janela anterior
+    // Checa se o # de sequencia estÃƒÂ¡ na janela anterior
     private boolean withinPrevWindow(int ackNum) {
         int distance = base - ackNum;
         if (base < ackNum) {
@@ -78,10 +78,11 @@ public class ClienteSR {
         while (true) {
             // receive packet
             socket.receive(receiveDatagram);
-            if(!descarta(this.prob)){//Caso seja descartado, o socket irÃ¡ sobrescrever o anterior
+           System.out.println("AQUI "+socket.getInetAddress());
+            if(!descarta(this.prob)){//Caso seja descartado, o socket irÃƒÂ¡ sobrescrever o anterior
                 Pacote pacote = Pacote.getPacote(receiveDatagram.getData());
 
-                // Obter as informaÃ§Ãµes do emissor.
+                // Obter as informaÃƒÂ§ÃƒÂµes do emissor.
                 if (!getChannelInfo) {
                     channelAddress = receiveDatagram.getAddress();
                     channelPort = receiveDatagram.getPort();
@@ -89,7 +90,7 @@ public class ClienteSR {
                 }
 
                 if (pacote.getTipo() == 2) {
-                    // Acaba a transmissÃ£o se o pacote for tipo FYN
+                    // Acaba a transmissÃƒÂ£o se o pacote for tipo FYN
                     Util.endReceiverSession(pacote, channelAddress, channelPort, socket);
                     break;
 
@@ -102,12 +103,12 @@ public class ClienteSR {
                         // Manda ACK
                         Util.enviaACK(ackNum, channelAddress, channelPort, socket);
 
-                        // Se o pacote for novo Ã© carregado no buffer
+                        // Se o pacote for novo ÃƒÂ© carregado no buffer
                         if (!map.containsKey(ackNum)) {
                             map.put(ackNum, pacote);
                         }
 
-                        // Se o # de seq == base, avanÃ§a a janela
+                        // Se o # de seq == base, avanÃƒÂ§a a janela
                         if (ackNum == base) {
                             while (map.containsKey(ackNum)) {
                                 fout.write(map.get(ackNum).getData());
@@ -117,7 +118,7 @@ public class ClienteSR {
                             base = ackNum % ModuloNumSeq;
                         }
                     } else if (withinPrevWindow(ackNum)) {
-                        // Se o pacote nÃ£o estiver na janela, reenvia o ACK
+                        // Se o pacote nÃƒÂ£o estiver na janela, reenvia o ACK
                         Util.enviaACK(ackNum, channelAddress, channelPort, socket);
                     }
                 }
