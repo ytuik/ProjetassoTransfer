@@ -55,7 +55,7 @@ public class ServidorSR {
                 // Pega o número do ACK
                 socket.receive(receiveDatagram);
                 pacote = Pacote.getPacote(receiveDatagram.getData());
-                System.out.println(String.format("PKT RECV ACK %s %s", pacote.getTamanho(), pacote.getSeqNum()));
+                System.out.println(String.format("Ack recebido. Tamanho: %s. #%s", pacote.getTamanho(), pacote.getSeqNum()));
                 int ackNum = pacote.getSeqNum();
 
                 // Marca o pacote como recebido na janela
