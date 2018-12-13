@@ -22,7 +22,7 @@ public class Util {
             socket.receive(receiveDatagram);
             return Pacote.getPacote(receiveDatagram.getData());
         } catch (Exception e) {
-            System.out.println("Exception when receiving pacote");
+            System.out.println("Excecao ao receber pacote");
             throw e;
         }
     }
@@ -44,7 +44,7 @@ public class Util {
         enviaPacote(Pacote.createFYN(seqNum).getBytes(), channelAddress, port, socket);
         System.out.println("PKT SEND FYN 12 " + seqNum);
 
-        // wait for FYN
+        // espera por FYN
         while (true) {
             Pacote pacote = Util.recebePacote(ACK_SIZE, socket);
             if (pacote.getTipo() == 2) {
@@ -60,7 +60,7 @@ public class Util {
             DatagramSocket socket) throws Exception {
         System.out.println(String.format("PKT RECV FYN %s %s", pacote.getTamanho(), pacote.getSeqNum()));
 
-        // reply FYN
+        // responde FYN
         Util.enviaPacote(Pacote.createFYN(pacote.getSeqNum()).getBytes(), channelAddress, channelPort, socket);
         System.out.println("PKT SEND FYN 12 " + pacote.getSeqNum());
     }
