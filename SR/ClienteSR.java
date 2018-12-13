@@ -23,7 +23,7 @@ public class ClienteSR {
     private int channelPort;
     private boolean getChannelInfo;
 
-    public static boolean descarta(int x) {//x ÃƒÂ© o nÃƒÂºmero definido pelo usuÃƒÂ¡rio de 0 a 100
+    public static boolean descarta(int x) {//x é o numero definido pelo usuario de 0 a 100
 	    Random gerador = new Random();
     	if(x > gerador.nextInt(100)) return true;
     	else return false;
@@ -51,7 +51,7 @@ public class ClienteSR {
         this.prob = prob;
     }
 
-    // Checa se o # de sequencia estÃƒÂ¡ dentro da janela
+    // Checa se o # de sequencia estara dentro da janela
     private boolean withinWindow(int ackNum) {
         int distance = ackNum - base;
         if (ackNum < base) {
@@ -60,7 +60,7 @@ public class ClienteSR {
         return distance < tamanho;
     }
 
-    // Checa se o # de sequencia estÃƒÂ¡ na janela anterior
+    // Checa se o # de sequencia estara na janela anterior
     private boolean withinPrevWindow(int ackNum) {
         int distance = base - ackNum;
         if (base < ackNum) {
@@ -79,10 +79,10 @@ public class ClienteSR {
             // receive packet
             socket.receive(receiveDatagram);
            System.out.println("AQUI "+socket.getInetAddress());
-            if(!descarta(this.prob)){//Caso seja descartado, o socket irÃƒÂ¡ sobrescrever o anterior
+            if(!descarta(this.prob)){//Caso seja descartado, o socket ira sobrescrever o anterior
                 Pacote pacote = Pacote.getPacote(receiveDatagram.getData());
 
-                // Obter as informaÃƒÂ§ÃƒÂµes do emissor.
+                // Obter as informacoes do emissor.
                 if (!getChannelInfo) {
                     channelAddress = receiveDatagram.getAddress();
                     channelPort = receiveDatagram.getPort();
@@ -95,7 +95,7 @@ public class ClienteSR {
                     break;
 
                 } else if (pacote.getTipo() == 0) {
-                    // process data packet
+                    // processa pacote
                     // System.out.println(String.format("PKT RECV DAT %s %s", pacote.getTamanho(), pacote.getSeqNum()));
                     int ackNum = pacote.getSeqNum();
                     // Se o # de sequencia estiver dentro da janela 
