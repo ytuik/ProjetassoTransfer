@@ -25,9 +25,9 @@ public class TimerPacket {
                     try {
                         ServidorSR.socket.send(sendPacket);
                     } catch (IOException e) {
-                        System.out.println("IOException when TimerPacket sending packet");
+                        System.out.println(e.getMessage());
                     }
-                    System.out.println(String.format("PKT SEND DAT %s %s", pacote.getTamanho(), pacote.getSeqNum()));
+                    System.out.println(String.format("Pacote de dados enviado. Tamanho: %s. #%s", pacote.getTamanho(), pacote.getSeqNum()));
                     timer.schedule(new TimeoutTask(), 50); // 50 é um valor razoavel que nos encontramos
                 }
             }
