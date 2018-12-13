@@ -14,22 +14,22 @@ public class Servidor {
         InetAddress clientIP;
         DatagramPacket receivePacket=new DatagramPacket(receiveData,receiveData.length);
         serverSocket.receive(receivePacket);
-        String filexWin = new String(receiveData, "UTF-8");
+        String filexWin = new String(receiveData, "UTF-8");//Pacote enviado pelo cliente solicitando certo arquivo
         filexWin = filexWin.trim();
         System.out.println("Conexão estabelecida");
-        System.out.println("IP: "+ receivePacket.getAddress());
-        System.out.println("Porta: "+ receivePacket.getPort());
-        String[] divide = filexWin.split("#");
-        System.out.println("Tamanho da janela: "+divide[1]);
+        System.out.println("IP: "+ receivePacket.getAddress());// IP do cliente
+        System.out.println("Porta: "+ receivePacket.getPort());// Porta do cliente
+        String[] divide = filexWin.split("#");//caractere especial que foi decidido
+        System.out.println("Tamanho da janela: "+divide[1]);// tamanho da janela solicitada pelo cliente
         System.out.println("Nome do arquivo solicitado: "+ divide[0]);
-        
-        int port = 1235;
+        int port = 1235;//Porta de conexão, caso dê erro nesta posta, mudar também em ClienteSR
 
         // Checa arquivo
         divide[0] = divide[0].trim();
-        String diret = "C:\\Users\\gtsa\\Desktop\\" + divide[0];
-        File f = new File(diret);
-        if (!f.exists() || !f.canRead()) {
+        String diret = "C:\\Users\\gtsa\\Desktop\\" + divide[0];//Mude esse diretório como se fosse a pasta padrão onde estará
+        //os arquivos
+        File f = new File(diret);//File com o diretório anterior
+        if (!f.exists() || !f.canRead()) { // em caso de arquivo não estar na pasta
             throw new Exception("Arquivo inexistente");
         }
         int janel = Integer.parseInt(divide[1]);
