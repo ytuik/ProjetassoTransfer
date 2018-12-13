@@ -30,21 +30,21 @@ public class ServidorSR {
     private int nextSeqNum;
     private int moduloNumSeq;
 
-    private volatile boolean sendFinished;
+    private volatile boolean sendFinished;//Saber se terminou de enviar
 
     public ServidorSR(File file, int channelPort, int janela) throws Exception {
         this.base = 0;
         this.nextSeqNum = 0;
         this.port = channelPort;
         this.channelAddress = InetAddress.getByName("172.20.4.69");//COLOQUE O IP DO CLIENTE AQUI
-        this.moduloNumSeq = janela * 2;
+        this.moduloNumSeq = janela * 2;//tamanho total do SR
         this.queue = new ArrayDeque<>();
         this.map = new HashMap<>();
         this.fileStream = new FileInputStream(file);
         this.sendFinished = false;
     }
 
-    // FunÃƒÂ§ÃƒÂ£o que recebe os ACKs
+    // Função que recebe os ACKs
     private void receivePackets() {
         byte[] buffer = new byte[TAMANHO_ACK];
         DatagramPacket receiveDatagram = new DatagramPacket(buffer, buffer.length);
@@ -52,7 +52,7 @@ public class ServidorSR {
 
         while (!sendFinished || !queue.isEmpty()) {
             try {
-                // Pega o nÃƒÂºmero do ACK
+                // Pega o número do ACK
                 socket.receive(receiveDatagram);
                 pacote = Pacote.getPacote(receiveDatagram.getData());
                 System.out.println(String.format("PKT RECV ACK %s %s", pacote.getTamanho(), pacote.getSeqNum()));
@@ -63,7 +63,7 @@ public class ServidorSR {
                     TimerPacket timerPacket = map.get(ackNum);
                     timerPacket.stopTimer();
 
-                    // AvanÃƒÂ§a a janela se base == # do Ack
+                    // Avança a janela se base == # do Ack
                     if (ackNum == base) {
                         while (!queue.isEmpty() && queue.peek().isAck()) {
                             timerPacket = queue.poll();
@@ -82,7 +82,7 @@ public class ServidorSR {
     public void start() throws Exception {
         socket = new DatagramSocket();
 
-        // CriaÃƒÂ§ÃƒÂ£o da thread que recebe os ACKs
+        // Criaçao da thread que recebe os ACKs
         Thread receiveThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -91,7 +91,7 @@ public class ServidorSR {
         });
         receiveThread.start();
 
-        System.out.println("ComeÃƒÂ§ando a enviar os dados");
+        System.out.println("Começando a enviar os dados, por favor aguarde.");
         while (true) {
             // Fazer cada pacote com seu timer
             byte[] buffer = new byte[TAMANHO_BUFFER];
@@ -104,23 +104,23 @@ public class ServidorSR {
             Pacote pacote = new Pacote(0, readNum + TAMANHO_CABECALHO, nextSeqNum, buffer);
             TimerPacket timerPacket = new TimerPacket(pacote);
 
-            // Manda o pacote e comeÃƒÂ§a o timer
+            // Manda o pacote e começa o timer
             available.acquire();
             queue.offer(timerPacket);
             map.put(nextSeqNum, timerPacket);
             timerPacket.startTimer();
             Util.enviaDados(pacote, channelAddress, port, socket);
 
-            // Atualiza o proximo nÃƒÂºmero de sequencia
+            // Atualiza o proximo numero de sequencia
             nextSeqNum = (nextSeqNum + 1) % moduloNumSeq;
         }
 
         // Espera a thread acabar
         receiveThread.join();
 
-        // Finaliza a sessÃƒÂ£o
+        // Finaliza a sessao
         Util.endSenderSession(base, channelAddress, port, socket);
-        System.out.println("Acabou de enviar os dados");
+        System.out.println("Acabou de enviar os dados, tenha um feliz natal.");
         socket.close();
         fileStream.close();
     }
