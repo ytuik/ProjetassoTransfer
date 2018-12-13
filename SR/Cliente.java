@@ -20,7 +20,7 @@ public class Cliente {
                 escolha = false;
                 break;
             } else {
-                System.out.println("OpÃ§Ã£o invÃ¡lida");
+                System.out.println("Opcao invalida");
             }
         }
         if (escolha) {
@@ -35,7 +35,7 @@ public class Cliente {
             if (prob < 100 && prob >= 0) {
                 break;
             }else{
-                System.out.println("Valor invÃ¡lido, por favor, digite um nÃºmero de 0 a 99.");
+                System.out.println("Valor invalido, por favor, digite um numero de 0 a 99.");
             }
         }
         s.nextLine();

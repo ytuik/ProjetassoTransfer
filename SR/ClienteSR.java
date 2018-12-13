@@ -103,12 +103,12 @@ public class ClienteSR {
                         // Manda ACK
                         Util.enviaACK(ackNum, channelAddress, channelPort, socket);
 
-                        // Se o pacote for novo ÃƒÂ© carregado no buffer
+                        // Se o pacote for novo nao carregado no buffer
                         if (!map.containsKey(ackNum)) {
                             map.put(ackNum, pacote);
                         }
 
-                        // Se o # de seq == base, avanÃƒÂ§a a janela
+                        // Se o # de seq == base, avanca a janela
                         if (ackNum == base) {
                             while (map.containsKey(ackNum)) {
                                 fout.write(map.get(ackNum).getData());
@@ -118,7 +118,7 @@ public class ClienteSR {
                             base = ackNum % ModuloNumSeq;
                         }
                     } else if (withinPrevWindow(ackNum)) {
-                        // Se o pacote nÃƒÂ£o estiver na janela, reenvia o ACK
+                        // Se o pacote nao estiver na janela, reenvia o ACK
                         Util.enviaACK(ackNum, channelAddress, channelPort, socket);
                     }
                 }
