@@ -11,57 +11,57 @@ public class Util {
             DatagramPacket enviaPacote = new DatagramPacket(bytes, bytes.length, address, port);
             socket.send(enviaPacote);
         } catch (Exception e) {
-            System.out.println("Exception when sending pacote");
+            System.out.println("Excecao quando enviou o pacote");
         }
     }
 
     public static Pacote recebePacote(int bufferSize, DatagramSocket socket) throws Exception {
         try {
             byte[] buffer = new byte[bufferSize];
-            DatagramPacket receiveDatagram = new DatagramPacket(buffer, buffer.length);
-            socket.receive(receiveDatagram);
-            return Pacote.getPacote(receiveDatagram.getData());
+            DatagramPacket recebeDatagrama = new DatagramPacket(buffer, buffer.length);
+            socket.receive(recebeDatagrama);
+            return Pacote.getPacote(recebeDatagrama.getData());
         } catch (Exception e) {
             System.out.println("Excecao ao receber pacote");
             throw e;
         }
     }
 
-    public static void enviaACK(int ackNum, InetAddress channelAddress, int channelPort, DatagramSocket socket)
+    public static void enviaACK(int ackNum, InetAddress enderecoCanal, int channelPort, DatagramSocket socket)
             throws Exception {
-        Util.enviaPacote(Pacote.createACK(ackNum).getBytes(), channelAddress, channelPort, socket);
-        System.out.println(String.format("PKT SEND ACK 12 %s", ackNum));
+        Util.enviaPacote(Pacote.createACK(ackNum).getBytes(), enderecoCanal, channelPort, socket);
+        System.out.println(String.format("ACK enviado: #%s", ackNum));
     }
 
-    public static void enviaDados(Pacote pacote, InetAddress channelAddress, int port, DatagramSocket socket) {
-        Util.enviaPacote(pacote.getBytes(), channelAddress, port, socket);
-        System.out.println(String.format("PKT SEND DAT %s %s", pacote.getTamanho(), pacote.getSeqNum()));
+    public static void enviaDados(Pacote pacote, InetAddress enderecoCanal, int port, DatagramSocket socket) {
+        Util.enviaPacote(pacote.getBytes(), enderecoCanal, port, socket);
+        System.out.println(String.format("Pacote de dados enviado. Tamanho: %s . #%s", pacote.getTamanho(), pacote.getSeqNum()));
     }
 
-    public static void endSenderSession(int seqNum, InetAddress channelAddress, int port, DatagramSocket socket)
+    public static void endSenderSession(int seqNum, InetAddress enderecoCanal, int port, DatagramSocket socket)
             throws Exception {
         // envia FYN
-        enviaPacote(Pacote.createFYN(seqNum).getBytes(), channelAddress, port, socket);
-        System.out.println("PKT SEND FYN 12 " + seqNum);
+        enviaPacote(Pacote.createFYN(seqNum).getBytes(), enderecoCanal, port, socket);
+        System.out.println("FYN enviado #" + seqNum);
 
         // espera por FYN
         while (true) {
             Pacote pacote = Util.recebePacote(ACK_SIZE, socket);
             if (pacote.getTipo() == 2) {
-                System.out.println("PKT RECV FYN 12 " + pacote.getSeqNum());
+                System.out.println("FYN recebido #" + pacote.getSeqNum());
                 break;
             } else if (pacote.getTipo() == 1) {
-                System.out.println("PKT RECV ACK 12 " + pacote.getSeqNum());
+                System.out.println("FYN recebido #" + pacote.getSeqNum());
             }
         }
     }
 
-    public static void endReceiverSession(Pacote pacote, InetAddress channelAddress, int channelPort,
+    public static void endReceiverSession(Pacote pacote, InetAddress enderecoCanal, int channelPort,
             DatagramSocket socket) throws Exception {
-        System.out.println(String.format("PKT RECV FYN %s %s", pacote.getTamanho(), pacote.getSeqNum()));
+        System.out.println(String.format("FYN recebido. Tamanho: %s. #%s", pacote.getTamanho(), pacote.getSeqNum()));
 
         // responde FYN
-        Util.enviaPacote(Pacote.createFYN(pacote.getSeqNum()).getBytes(), channelAddress, channelPort, socket);
-        System.out.println("PKT SEND FYN 12 " + pacote.getSeqNum());
+        Util.enviaPacote(Pacote.createFYN(pacote.getSeqNum()).getBytes(), enderecoCanal, channelPort, socket);
+        System.out.println("FYN enviado #" + pacote.getSeqNum());
     }
 }
