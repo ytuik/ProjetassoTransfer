@@ -28,7 +28,7 @@ public class TimerPacket {
                         System.out.println("IOException when TimerPacket sending packet");
                     }
                     System.out.println(String.format("PKT SEND DAT %s %s", pacote.getTamanho(), pacote.getSeqNum()));
-                    timer.schedule(new TimeoutTask(), 50); // 50 é um valor temporario, até a gente achar um timeout melhor.
+                    timer.schedule(new TimeoutTask(), 50); // 50 é um valor razoavel que nos encontramos
                 }
             }
         }
@@ -44,7 +44,7 @@ public class TimerPacket {
 
     public void startTimer() {
         timer = new Timer();
-        timer.schedule(new TimeoutTask(), 50); // 50 é um valor temporario, até a gente achar um timeout melhor.
+        timer.schedule(new TimeoutTask(), 50); 
     }
 
     public void stopTimer() {
