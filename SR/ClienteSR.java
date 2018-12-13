@@ -52,21 +52,21 @@ public class ClienteSR {
     }
 
     // Checa se o # de sequencia estara dentro da janela
-    private boolean withinWindow(int ackNum) {
-        int distance = ackNum - base;
+    private boolean dentroJanela(int ackNum) {
+        int distancia = ackNum - base;
         if (ackNum < base) {
-            distance += ModuloNumSeq;
+            distancia += ModuloNumSeq;
         }
-        return distance < tamanho;
+        return distancia < tamanho;
     }
 
     // Checa se o # de sequencia estara na janela anterior
-    private boolean withinPrevWindow(int ackNum) {
-        int distance = base - ackNum;
+    private boolean dentroJanelaAnterior(int ackNum) {
+        int distancia = base - ackNum;
         if (base < ackNum) {
-            distance += ModuloNumSeq;
+            distancia += ModuloNumSeq;
         }
-        return distance <= tamanho && distance > 0;
+        return distancia <= tamanho && distancia > 0;
     }
 
     public void start() throws Exception {
@@ -90,16 +90,16 @@ public class ClienteSR {
                 }
 
                 if (pacote.getTipo() == 2) {
-                    // Acaba a transmissÃƒÂ£o se o pacote for tipo FYN
+                    // Acaba a transmissao se o pacote for tipo FYN
                     Util.endReceiverSession(pacote, channelAddress, channelPort, socket);
                     break;
 
                 } else if (pacote.getTipo() == 0) {
                     // processa pacote
-                    // System.out.println(String.format("PKT RECV DAT %s %s", pacote.getTamanho(), pacote.getSeqNum()));
+                    System.out.println(String.format("Pacote de dados recebido. Tamanho: %s. #%s", pacote.getTamanho(), pacote.getSeqNum()));
                     int ackNum = pacote.getSeqNum();
                     // Se o # de sequencia estiver dentro da janela 
-                    if (withinWindow(ackNum)) {
+                    if (dentroJanela(ackNum)) {
                         // Manda ACK
                         Util.enviaACK(ackNum, channelAddress, channelPort, socket);
 
@@ -117,7 +117,7 @@ public class ClienteSR {
                             }
                             base = ackNum % ModuloNumSeq;
                         }
-                    } else if (withinPrevWindow(ackNum)) {
+                    } else if (dentroJanelaAnterior(ackNum)) {
                         // Se o pacote nao estiver na janela, reenvia o ACK
                         Util.enviaACK(ackNum, channelAddress, channelPort, socket);
                     }
