@@ -23,7 +23,7 @@ public class ClienteSR {
     private int channelPort;
     private boolean getChannelInfo;
 
-    public static boolean descarta(int x) {//x é o numero definido pelo usuario de 0 a 100
+    public static boolean descarta(int x) {//x é o numero definido pelo usuario de 0 a 99
 	    Random gerador = new Random();
     	if(x > gerador.nextInt(100)) return true;
     	else return false;
@@ -74,7 +74,7 @@ public class ClienteSR {
         byte[] buffer = new byte[TAMANHO_BUFFER];
         DatagramPacket receiveDatagram = new DatagramPacket(buffer, buffer.length);
 
-        System.out.println("Start to receive data");
+        System.out.println("Comecou a receber dados.");
         while (true) {
             // receive packet
             socket.receive(receiveDatagram);
